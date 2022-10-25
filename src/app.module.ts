@@ -4,11 +4,14 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './modules/db/db.module';
 import { ToolsModule } from './modules/tools/tools.module';
+import config from './config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      // load: [config],
+      load: [config],
       isGlobal: true,
       envFilePath: '.env',
     }),
@@ -16,6 +19,12 @@ import { ToolsModule } from './modules/tools/tools.module';
     ToolsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
 })
 export class AppModule {}

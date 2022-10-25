@@ -6,14 +6,14 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { LoggerService } from "./logger/logger.service";
+import { LoggerService } from './logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   const configService = app.get<ConfigService>(ConfigService);
 
-  const logsDir = configService.get<string>('logsDir');
+  const logsDir = configService.get<string>('logDir');
   const logger = new LoggerService(logsDir);
   // 使用全局异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter(logger));
@@ -29,6 +29,6 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT') || 7840;
   await app.listen(port);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  logger.log(`Server running on http://localhost:${port}`, 'Bootstrap');
 }
 bootstrap();
