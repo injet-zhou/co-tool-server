@@ -5,8 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './modules/db/db.module';
 import { ToolsModule } from './modules/tools/tools.module';
 import config from './config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -14,6 +15,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       load: [config],
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    ThrottlerModule.forRoot({
+      ttl: 1,
+      limit: 5,
     }),
     DbModule,
     ToolsModule,
@@ -24,6 +29,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

@@ -7,14 +7,16 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerService } from './logger/logger.service';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-
+  app.use(helmet());
   const configService = app.get<ConfigService>(ConfigService);
 
   const logsDir = configService.get<string>('logDir');
   const logger = new LoggerService(logsDir);
+  app.useLogger(logger);
   // 使用全局异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter(logger));
 

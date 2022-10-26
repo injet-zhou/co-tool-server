@@ -21,6 +21,11 @@ const buildBaseFields = (table: Knex.CreateTableBuilder, options: any) => {
   table.boolean('DEL').defaultTo(false);
 };
 
+const handleSql = (sql: string) => {
+  const res = sql.replace(/datetime2/g, 'smalldatetime');
+  return res.replace(/CURRENT_TIMESTAMP/g, 'GETDATE()');
+};
+
 const buildTable = (dto: BuildTableDto) => {
   const { tableName, columns, options } = dto;
   let k: Knex;
@@ -63,5 +68,8 @@ const buildTable = (dto: BuildTableDto) => {
     });
     buildBaseFields(table, options);
   });
-  return format(table.toQuery());
+  const sql = handleSql(table.toQuery());
+  return format(sql, {
+    language: 'transactsql',
+  });
 };
