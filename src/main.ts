@@ -9,6 +9,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggerService } from './logger/logger.service';
 import helmet from 'helmet';
 
+declare const module: any;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.use(helmet());
@@ -31,6 +33,10 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT') || 7840;
   await app.listen(port);
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
   logger.log(`Server running on http://localhost:${port}`, 'Bootstrap');
 }
 bootstrap();

@@ -1,5 +1,7 @@
 import * as md5 from 'md5';
 import axios from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
 const APP_ID = process.env.APP_ID;
 const APP_KEY = process.env.APP_KEY;
 
