@@ -1,6 +1,7 @@
 export interface TableOptions {
   autoIncrement: boolean;
   type: string;
+  isDefaultID: boolean;
 }
 
 export interface ColumnDef {

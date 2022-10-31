@@ -39,7 +39,11 @@ const buildTable = (dto: BuildTableDto) => {
     default:
       knex({ client: DBType.MSSQL });
   }
+  const { autoIncrement, isDefaultID } = options;
   const table = k.schema.createTable(tableName, (table) => {
+    if (isDefaultID) {
+      table.increments('id').primary();
+    }
     columns.forEach((column) => {
       const {
         name,
@@ -64,6 +68,9 @@ const buildTable = (dto: BuildTableDto) => {
       }
       if (isPrimaryKey) {
         col.primary();
+        if (autoIncrement) {
+          col.increments();
+        }
       }
     });
     buildBaseFields(table, options);
